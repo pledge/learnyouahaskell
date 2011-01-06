@@ -98,3 +98,66 @@ numLongChains = length (filter isLong (map chain [1..100]))
 numLongChains' :: Int
 numLongChains' = length (filter (\xs -> length xs > 15) (map chain [1..100]))
 
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (\acc x -> acc + x) 0 xs
+
+sum'' :: (Num a) => [a] -> a
+sum'' = foldl (+) 0
+
+-- generally if you have a function foo a = bar b a
+-- it can be rewritten as foo = bar b due to currying
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' y ys = foldl (\acc x -> if x == y then True else acc) False ys
+
+map'' :: (a->b) -> [a] -> [b]
+map'' f xs = foldr (\x acc -> f x : acc) [] xs
+
+-- could have also used foldl for the above, but would have required
+-- use of ++ instead of cons (:). so foldr is preferred when building
+-- up new lists from a list
+-- right folds work on infinite lists, left folds do not
+-- foldl1 and foldr1 do not require an explicit starting value
+-- they use the first item of the list
+
+maximum' :: (Ord a) => [a] -> a
+maximum' = foldr1 (\x acc -> if x > acc then x else acc)
+
+reverse' :: [a] -> [a]
+reverse' = foldl (\acc x -> x : acc) []
+
+product' :: (Num a) => [a] -> a
+product' = foldr1 (*)
+
+filter'' :: (a -> Bool) -> [a] -> [a]
+filter'' p = foldr (\x acc -> if p x then x : acc else acc) []
+
+head' :: [a] -> a
+head' = foldr1 (\x _ -> x)
+
+last' :: [a] -> a
+last' = foldl1 (\_ x -> x)
+
+-- scanl and scanr are like foldl/r only they report all the
+-- intermediate accumulator states as a list
+-- with scanl the result is the last element
+-- with scanr the result is the head
+
+scanlPlus = scanl (+) 0 [3,5,2,1]
+scanrPlus = scanr (+) 0 [3,5,2,1]
+
+-- how many elements does it take for the sum
+-- of the roots of all natural numbers to exceed 1000?
+
+sqrtSums :: Int
+sqrtSums = length (takeWhile (<1000) (scanl1 (+) (map sqrt [1..]))) + 1
+
+-- $ makes function application right-associative
+-- sum (map sqrt [1..130] can be rewritten
+-- sum $ map sqrt [1..130]
+
+-- function composition using (.)
+
+notcomposed = map (\x -> negate (abs x)) [5,-3,-6,7,-3,2,-19,24]
+composed = map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+
